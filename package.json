@@ -4,7 +4,7 @@
   "description": "Built with NodeJS",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "nodemon index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/Kingsley-coder-prog/node-farm/issues"
   },
-  "homepage": "https://github.com/Kingsley-coder-prog/node-farm#readme"
+  "homepage": "https://github.com/Kingsley-coder-prog/node-farm#readme",
+  "dependencies": {
+    "slugify": "^1.6.6"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
 }
