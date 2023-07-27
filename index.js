@@ -1,5 +1,9 @@
 const fs = require("fs");
+const http = require("http");
+const url = require("url");
 
+/////////////////////////////////////////////////////////////
+// FILES
 // Blocking, synchronous way
 // const textIn = fs.readFileSync("./txt/input.txt", "utf-8");
 // console.log(textIn);
@@ -12,18 +16,83 @@ const fs = require("fs");
  * fs.writeFile('./txt/final.txt', `${data2}\n${data3}`, 'utf-8', (err)=>{})
  */
 
+///////////////////////////////////////////////////////////
 // Non-Blocking, Asynchronous way
-fs.readFile("./txt/start.txt", "utf-8", (err, data1) => {
-  fs.readFile(`./txt/${data1}.txt`, "utf-8", (err, data2) => {
-    console.log(data2);
-    fs.readFile(`./txt/append.txt`, "utf-8", (err, data3) => {
-      console.log(data3);
+// fs.readFile("./txt/start.txt", "utf-8", (err, data1) => {
+//   fs.readFile(`./txt/${data1}.txt`, "utf-8", (err, data2) => {
+//     console.log(data2);
+//     fs.readFile(`./txt/append.txt`, "utf-8", (err, data3) => {
+//       console.log(data3);
 
-      fs.writeFile("./txt/final.txt", `${data2}\n${data3}`, "utf-8", err => {
-        console.log("Your file has been written!😁");
-      });
+//       fs.writeFile("./txt/final.txt", `${data2}\n${data3}`, "utf-8", err => {
+//         console.log("Your file has been written!😁");
+//       });
+//     });
+//   });
+// });
+
+// console.log("Will read this!");
+
+/////////////////////////////////////////////////////////////
+// SERVERS
+/**
+ * In order to build our server we have to do two things:
+ * 1. Create the servers
+ * 2. Start the servers
+ * http.createServer()// accepts a callback function which will be fired off each time a new request hits our server. The callback function gets access to two important variables; (request,response)
+ * The 'response' is sent back to the client, and it gives us a bunch of ways of sending the response in which .end() is the simplest
+ */
+
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
+const dataObject = JSON.parse(data);
+
+const server = http.createServer((req, res) => {
+  const pathName = req.url;
+  if (pathName === "/" || pathName === "/overview") {
+    res.end("This is the OVERVIEW");
+  } else if (pathName === "/product") {
+    res.end("This is the PRODUCT");
+  } else if (pathName === "/api") {
+    res.writeHead(200, {
+      "Content-type": "application/json"
     });
-  });
+    res.end(data);
+  } else {
+    // In the 404 we can still send headers and to do that we need an object
+    // An http header is simply a piece of information about the response we are sending back
+    // The header and the 404 always need to be sent out before we send our 'response'
+    res.writeHead(404, {
+      "Content-type": "text/html",
+      "my-own-header": "hello-world"
+    }); // status code error
+    res.end("<h1>Page not found!</h1>");
+  }
+
+  //   res.end("Hello from the server!!"); // .end is the simplest way of sending back a response
 });
 
-console.log("Will read this!");
+/**
+ * Now to listen to the server that has been created, we can save the server in a variable, like above.
+ * In order to listen to the server we need .listen() which takes in two args, one of which is a port(a sub-address on a host on a certain host) and a host.
+ * local host standard IP address: '127.0.0.1'
+ * we can include an optional callback function in the args, this will be run as soon as the server starts listening
+ */
+
+server.listen(8000, "127.0.0.1", () => {
+  console.log("Listening to requests on port 8000");
+});
+
+// const server2 = http.createServer((req, res) => {
+//   console.log("We are live!");
+// });
+
+// server2.listen(7000, "127.0.0.1", () => {
+//   console.log("Another request incoming!");
+// });
+
+// ROUTING
+/**
+ * Inorder to be able to do routing the first step is in been able to analyse the url, and for that we need a built in node module called 'url'
+ * When we are using a browser, the browser automatically performs a request for the website favicon
+ * To implement the routing we need a big 'if/else' statement
+ */
